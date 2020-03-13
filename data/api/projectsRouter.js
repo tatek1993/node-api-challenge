@@ -18,6 +18,18 @@ router.get('/', (req, res) => {
             });
         });
 });
+router.get('/:id', (req, res) => {
+    Projects.get(req.params.id)
+        .then(project => {
+            res.status(200).json(project)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: "There was a problem grabbing the projects"
+            });
+        });
+});
 router.post('/', (req, res) => {
     const body = req.body;
     Projects.insert(body)
@@ -35,7 +47,7 @@ router.post('/', (req, res) => {
 });
 router.put('/:id', (req, res) => {
     console.log(req.body);
-    const id = req.params.id;
+    const {id} = req.params;
     const body = req.body;
 
     Projects.update(id, body)
@@ -73,3 +85,16 @@ router.delete('/:id', async (req, res) => {
             });
     }
 });
+
+router.get('/:id/actions', (req, res) => {
+    Projects.getProjectActions(req.params.id)
+        .then(act => {
+            res.status(200).json(act)
+        })
+        .catch(err => {
+            res.status(500).json({
+                errorMessage: "The action information could not be retrieved."
+            });
+        });
+});
+
