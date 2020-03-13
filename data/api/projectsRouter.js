@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
             });
         });
 });
-router.get('/:id', (req, res) => {
+router.get('/:id', validateProjectId, (req, res) => {
     Projects.get(req.params.id)
         .then(project => {
             res.status(200).json(project)
@@ -45,7 +45,7 @@ router.post('/', (req, res) => {
             });
         });
 });
-router.put('/:id', (req, res) => {
+router.put('/:id', validateProjectId, (req, res) => {
     console.log(req.body);
     const {id} = req.params;
     const body = req.body;
@@ -63,7 +63,7 @@ router.put('/:id', (req, res) => {
             });
         });
 });
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', validateProjectId, async (req, res) => {
     const { id } = req.params;
     const projectId = await Projects.get(id);
 
@@ -85,8 +85,7 @@ router.delete('/:id', async (req, res) => {
             });
     }
 });
-
-router.get('/:id/actions', (req, res) => {
+router.get('/:id/actions', validateProjectId, (req, res) => {
     Projects.getProjectActions(req.params.id)
         .then(act => {
             res.status(200).json(act)
@@ -98,3 +97,22 @@ router.get('/:id/actions', (req, res) => {
         });
 });
 
+function validateProjectId(req, res, next) {
+    // do your magic!
+    Projects.get(req.params.id)
+    .then(project => {
+      if (project == null) {
+          res.status(404).json({message: "The project with the specified ID does not exist."})
+      } else {
+          next();
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ 
+          error: "The project information could not be retrieved." 
+      });
+    });
+    
+    
+}
